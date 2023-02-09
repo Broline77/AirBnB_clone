@@ -1,6 +1,6 @@
 ## Authors:
 
-Broline Oronu, Saefullah Sadiq
+Broline Oronu
 
 ## Description
 
