@@ -1,48 +1,59 @@
-#!/usr/bin/env python3
-""" model - storage model"""
+#!/usr/bin/python3
+"""
+Contains the FileStorage class model
 
+
+"""
 import json
-from datetime import datetime
+
 from models.base_model import BaseModel
 from models.user import User
 from models.state import State
-from models.city import City
 from models.amenity import Amenity
+from models.city import City
 from models.place import Place
 from models.review import Review
 
+
 class FileStorage:
+    """
+    serializes instances to a JSON file and
+    deserializes JSON file to instances
+    """
+
     __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        return FileStorage.__objects
+        """
+        Returns the dictionary __objects
+        """
+        return self.__objects
 
     def new(self, obj):
-        key = "{}.{}".format(type(obj).__name__, obj.id)
-        FileStorage.__objects[key] = obj
+        """
+        sets in __objects the `obj` with key <obj class name>.id
+        """
+        self.__objects["{}.{}".format(obj.__class__.__name__, obj.id)] = obj
 
     def save(self):
-        with open(FileStorage.__file_path, mode="w", encoding="utf-8") as f:
-            json_str = json.dumps(FileStorage.__objects, default=lambda obj: obj.to_dict())
-            f.write(json_str)
+        """
+        Serialize __objects to the JSON file
+        """
+        with open(self.__file_path, mode="w") as f:
+            dict_storage = {}
+            for k, v in self.__objects.items():
+                dict_storage[k] = v.to_dict()
+            json.dump(dict_storage, f)
 
     def reload(self):
+        """
+        Deserializes the JSON file to __objects
+        -> Only IF it exists!
+        """
         try:
-            with open(FileStorage.__file_path, encoding="utf-8")as f:
-                FileStorage.__objects = json.loads(f.read(), object_hook=self.json_to_python)
+            with open(self.__file_path, encoding="utf-8") as f:
+                for obj in json.load(f).values():
+                    self.new(eval(obj["__class__"])(**obj))
         except FileNotFoundError:
-            pass
-
-    @staticmethod
-    def json_to_python(json_dict):
-        """static metod to pass to json loads"""
-        if "__class__" in json_dict:
-            class_name = json_dict["__class__"]
-            if class_name == "BaseModel":
-                return BaseModel(**json_dict)
-            else:
-                return json_dict
-        else:
-            return json_dict
-
+            return

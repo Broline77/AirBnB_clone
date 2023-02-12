@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
-""" model - state """
-
+#!/usr/bin/python3
+"""A module containing the State model"""
 from models.base_model import BaseModel
 
+
 class State(BaseModel):
-    """ class containing the state for the airbnb"""
-    name = ''
+    """Implements the State model for any state object"""
+    name = ""
